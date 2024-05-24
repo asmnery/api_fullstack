@@ -8,7 +8,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = environ.get('DB_URL')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
-bcrypt = Bcrypt(app)  # Inicializar o Bcrypt com a aplicação Flask
+bcrypt = Bcrypt(app)  
 
 # Model usuario
 class User(db.Model):
@@ -16,17 +16,17 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(60), nullable=False)  # Remover unique=True para senha
+    password = db.Column(db.String(60), nullable=False)  
 
     def set_password(self, password):
         try:
-            self.password = bcrypt.generate_password_hash(password).decode('utf-8')  # Usar bcrypt para hashear a senha
+            self.password = bcrypt.generate_password_hash(password).decode('utf-8')  
         except Exception as e:
             print(f"Error in set_password: {e}")
             print(traceback.format_exc())
 
     def check_password(self, password):
-        return bcrypt.check_password_hash(self.password, password)  # Verificar a senha
+        return bcrypt.check_password_hash(self.password, password)  
 
     def json(self):
         return {'id': self.id, 'usuario': self.username, 'email': self.email, 'password': self.password}
@@ -54,21 +54,19 @@ def test():
 def criar_usuario():
     try:
         data = request.get_json()
-
-        # Verificar se o username ou email já existem
         if User.query.filter_by(username=data['username']).first():
             return make_response(jsonify({'mensagem': 'Nome de usuário já existe.'}), 400)
         if User.query.filter_by(email=data['email']).first():
             return make_response(jsonify({'mensagem': 'Email já existe.'}), 400)
 
         new_user = User(username=data['username'], email=data['email'])
-        new_user.set_password(data['password'])  # Usar set_password para hashear a senha
+        new_user.set_password(data['password'])  
         db.session.add(new_user)
         db.session.commit()
         return make_response(jsonify({'mensagem': 'Usuário criado com sucesso.'}), 201)
     except Exception as e:
-        print(f"Error in criar_usuario: {e}")  # Adicionar print para log de erro
-        print(traceback.format_exc())  # Adicionar rastreamento de pilha
+        print(f"Error in criar_usuario: {e}")  
+        print(traceback.format_exc())  
         return make_response(jsonify({'mensagem': 'Erro ao criar o usuário.'}), 500)
      
 #listar todos usuários
