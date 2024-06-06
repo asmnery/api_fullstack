@@ -1,5 +1,9 @@
 flask
 psycopg2-binary
 Flask-SQLAlchemy
+<<<<<<< HEAD
 Flask-Bcrypt
 flask_cors
+=======
+Flask-Bcrypt
+>>>>>>> main
